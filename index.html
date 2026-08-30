@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="es" data-bs-theme="dark">
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ManoLingua</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -21,15 +22,16 @@
     <p class="text-center" id="predict" style="display: none;"></p>
 
     <div class="d-flex justify-content-between">
-      <button class="btn btn btn-dark btn-lg" type="button" data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"><i
-          class="fa-solid fa-ellipsis-vertical"></i></button>
-      <button type="button" class="btn btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <button class="btn btn-dark btn-lg" type="button" data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
+        title="Lista de letras">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </button>
+      <button type="button" class="btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal"
+        title="Ver ejemplo de la seña">
         <i class="fa-solid fa-question"></i>
       </button>
-
     </div>
-
 
     <div class="offcanvas offcanvas-start offcanvas-dark" data-bs-scroll="true" tabindex="-1"
       id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
@@ -53,6 +55,7 @@
           <a href="#" class="list-group-item list-group-item-action">L</a>
           <a href="#" class="list-group-item list-group-item-action">M</a>
           <a href="#" class="list-group-item list-group-item-action">N</a>
+          <a href="#" class="list-group-item list-group-item-action">Ñ</a>
           <a href="#" class="list-group-item list-group-item-action">O</a>
           <a href="#" class="list-group-item list-group-item-action">P</a>
           <a href="#" class="list-group-item list-group-item-action">Q</a>
@@ -69,20 +72,16 @@
       </div>
     </div>
 
-    <div id="liveView" class="videoView" style="display: flex;">
-      <div style="flex: 1;">
-        <button id="webcamButton" class="btn btn-dark mdc-button mdc-button--raised mt-5">
-          <span class="mdc-button__ripple"></span>
-          <span class="mdc-button__label">HABILITAR WEBCAM</span>
-        </button>
-        <div style="display: flex; justify-content: center; align-items: center; height: 75vh;">
-          <video id="webcam" style="position: absolute" autoplay playsinline></video>
-          <canvas class="output_canvas" id="output_canvas" style="position: absolute;"></canvas>
+    <div id="liveView" class="videoView">
+      <div class="camera-column">
+        <div id="videoStage" class="video-stage">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas class="output_canvas" id="output_canvas"></canvas>
+          <p id="cameraHint" class="camera-hint">Activando cámara…</p>
         </div>
       </div>
-      <div id="letterDiv"
-        style="flex: 1; display: flex; justify-content: center; align-items: center; visibility: hidden;">
-        <div id="letterText" style="font-size: 20em;"></div>
+      <div id="letterDiv">
+        <div id="letterText"></div>
       </div>
       <div id="imageContainer">
         <img id="imageLetter" src="" alt="">
@@ -90,51 +89,36 @@
     </div>
   </section>
 
-
-  <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body" style="display: flex; justify-content: center;">
-          <img id="imagenModal" src="" style="width: 250px; margin: auto;">
+          <img id="imagenModal" src="" alt="Ejemplo de seña" style="width: 250px; margin: auto;">
         </div>
       </div>
     </div>
   </div>
 
-  <script type="module" src="./script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js" type="text/javascript"></script>
+  <footer class="footer-distributed">
+    <div class="footer-left">
+      <img src="resources/logo/ujat.png" width="55%" alt="UJAT">
+    </div>
+    <div class="footer-center" style="width: 400px; text-align: center;">
+      <img style="margin-right: 100px;" class="text-center" src="resources/logo/dacyti.png" width="50%" alt="DACYTI">
+    </div>
+    <div class="footer-right" style="margin-left: 80px;">
+      <img src="resources/logo/eges.png" width="85%" alt="EGES">
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+  <script type="module" src="./script.js"></script>
 
 </body>
-
-<section>
-  <footer class="footer-distributed">
-
-    <div class="footer-left">
-
-      <img src="resources/logo/ujat.png" width="55%">
-
-    </div>
-
-    <div class="footer-center" style="width: 400px; text-align: center;">
-
-      <img style="margin-right: 100px;" class="text-center" src="resources/logo/dacyti.png"
-        width="50%">
-    </div>
-
-
-    <div class="footer-right" style="margin-left: 80px;">
-
-      <img src="/resources/logo/eges.png" width="85%">
-
-    </div>
-
-  </footer>
-</section>
 
 </html>
