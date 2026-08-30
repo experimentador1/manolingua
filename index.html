@@ -4,111 +4,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ManoLingua</title>
+  <title>Aplicación de Dactilología</title>
+  <meta name="description"
+    content="App educativa del GI Cómputo Aplicado para la Sociedad para practicar el alfabeto dactilológico de la Lengua de Señas Mexicana.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <section id="demos" class="invisible m-5">
+  <header class="app-header">
+    <h1 class="app-title">Aplicación de Dactilología</h1>
+    <p class="app-subtitle">App educativa desarrollada por el GI: Cómputo Aplicado para la Sociedad</p>
+  </header>
 
-    <h2 class="text-center">Reconocedor de Señas</h2>
+  <main id="demos" class="invisible app-main">
 
-    <p class="text-center" id="status">Cargando...</p>
+    <section class="step" aria-labelledby="stepLetters">
+      <h2 class="step-title" id="stepLetters">
+        <span class="step-number" aria-hidden="true">1</span>
+        Elige una letra para practicar
+      </h2>
 
-    <p class="text-center" id="predict" style="display: none;"></p>
-
-    <div class="d-flex justify-content-between">
-      <button class="btn btn-dark btn-lg" type="button" data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
-        title="Lista de letras">
-        <i class="fa-solid fa-ellipsis-vertical"></i>
-      </button>
-      <button type="button" class="btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal"
-        title="Ver ejemplo de la seña">
-        <i class="fa-solid fa-question"></i>
-      </button>
-    </div>
-
-    <div class="offcanvas offcanvas-start offcanvas-dark" data-bs-scroll="true" tabindex="-1"
-      id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Lista de letras</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <div class="alphabet" role="group" aria-label="Letras del alfabeto dactilológico">
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">A</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">B</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">C</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">D</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">E</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">F</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">G</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">H</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">I</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">J</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">K</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">L</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">M</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">N</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">Ñ</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">O</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">P</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">Q</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">R</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">S</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">T</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">U</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">V</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">W</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">X</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">Y</button>
+        <button type="button" class="list-group-item letter-btn" aria-pressed="false">Z</button>
       </div>
-      <div class="offcanvas-body">
-        <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-action">A</a>
-          <a href="#" class="list-group-item list-group-item-action">B</a>
-          <a href="#" class="list-group-item list-group-item-action">C</a>
-          <a href="#" class="list-group-item list-group-item-action">D</a>
-          <a href="#" class="list-group-item list-group-item-action">E</a>
-          <a href="#" class="list-group-item list-group-item-action">F</a>
-          <a href="#" class="list-group-item list-group-item-action">G</a>
-          <a href="#" class="list-group-item list-group-item-action">H</a>
-          <a href="#" class="list-group-item list-group-item-action">I</a>
-          <a href="#" class="list-group-item list-group-item-action">J</a>
-          <a href="#" class="list-group-item list-group-item-action">K</a>
-          <a href="#" class="list-group-item list-group-item-action">L</a>
-          <a href="#" class="list-group-item list-group-item-action">M</a>
-          <a href="#" class="list-group-item list-group-item-action">N</a>
-          <a href="#" class="list-group-item list-group-item-action">Ñ</a>
-          <a href="#" class="list-group-item list-group-item-action">O</a>
-          <a href="#" class="list-group-item list-group-item-action">P</a>
-          <a href="#" class="list-group-item list-group-item-action">Q</a>
-          <a href="#" class="list-group-item list-group-item-action">R</a>
-          <a href="#" class="list-group-item list-group-item-action">S</a>
-          <a href="#" class="list-group-item list-group-item-action">T</a>
-          <a href="#" class="list-group-item list-group-item-action">U</a>
-          <a href="#" class="list-group-item list-group-item-action">V</a>
-          <a href="#" class="list-group-item list-group-item-action">W</a>
-          <a href="#" class="list-group-item list-group-item-action">X</a>
-          <a href="#" class="list-group-item list-group-item-action">Y</a>
-          <a href="#" class="list-group-item list-group-item-action">Z</a>
+    </section>
+
+    <section class="step" aria-labelledby="stepPractice">
+      <h2 class="step-title" id="stepPractice">
+        <span class="step-number" aria-hidden="true">2</span>
+        Haz la seña frente a la cámara
+      </h2>
+
+      <div class="practice">
+
+        <div class="panel camera-panel">
+          <div id="videoStage" class="video-stage">
+            <video id="webcam" autoplay playsinline muted></video>
+            <canvas class="output_canvas" id="output_canvas"></canvas>
+            <p id="cameraHint" class="camera-hint">
+              <i class="fa-solid fa-video" aria-hidden="true"></i>
+              Activando cámara…
+            </p>
+          </div>
+
+          <div class="feedback">
+            <p id="predict" class="result" role="status" style="display: none;"></p>
+
+            <div class="meter-row">
+              <div class="meter" id="confidenceMeter" role="progressbar" aria-label="Similitud con la seña"
+                aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="confidenceFill" class="meter-fill"></div>
+              </div>
+              <span id="confidenceValue" class="meter-value" aria-hidden="true">0%</span>
+            </div>
+
+            <p id="status" class="status" aria-live="polite">Cargando…</p>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div id="liveView" class="videoView">
-      <div class="camera-column">
-        <div id="videoStage" class="video-stage">
-          <video id="webcam" autoplay playsinline muted></video>
-          <canvas class="output_canvas" id="output_canvas"></canvas>
-          <p id="cameraHint" class="camera-hint">Activando cámara…</p>
-        </div>
+        <aside class="panel guide-panel" aria-labelledby="guideTitle">
+          <h3 class="panel-title" id="guideTitle">Seña de referencia</h3>
+
+          <div id="letterDiv" class="letter-display">
+            <div id="letterText"></div>
+          </div>
+
+          <div id="imageContainer" class="reference">
+            <p class="reference-empty">
+              <i class="fa-solid fa-hand" aria-hidden="true"></i>
+              Elige una letra para ver cómo se hace
+            </p>
+            <img id="imageLetter" src="" alt="">
+          </div>
+
+          <button type="button" id="zoomButton" class="btn-ghost" data-bs-toggle="modal"
+            data-bs-target="#exampleModal" disabled>
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
+            Ver en grande
+          </button>
+        </aside>
+
       </div>
-      <div id="letterDiv">
-        <div id="letterText"></div>
+    </section>
+
+    <details class="help">
+      <summary class="help-summary">
+        <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+        ¿Cómo funciona?
+      </summary>
+      <div class="help-body">
+        <p>
+          La cámara detecta los puntos de tu mano y dibuja un esqueleto verde sobre ella.
+          Ese trazo es lo que analiza el modelo para decidir si tu seña corresponde a la letra elegida.
+        </p>
+        <ul>
+          <li>Si no aparece el esqueleto, acerca la mano o mejora la iluminación.</li>
+          <li>La barra indica qué tan parecida es tu seña a la letra seleccionada.</li>
+          <li>Tu video se procesa en el navegador: no se envía a ningún servidor.</li>
+        </ul>
       </div>
-      <div id="imageContainer">
-        <img id="imageLetter" src="" alt="">
-      </div>
-    </div>
-  </section>
+    </details>
+
+  </main>
+
+  <div class="boot-loader" role="status">
+    <span class="boot-spinner" aria-hidden="true"></span>
+    <p>Cargando modelos de reconocimiento…</p>
+  </div>
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-body" style="display: flex; justify-content: center;">
-          <img id="imagenModal" src="" alt="Ejemplo de seña" style="width: 250px; margin: auto;">
+        <div class="modal-header">
+          <h4 class="modal-title" id="exampleModalLabel">Seña de referencia</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <img id="imagenModal" src="" alt="Ejemplo ampliado de la seña">
         </div>
       </div>
     </div>
   </div>
 
-  <footer class="footer-distributed">
-    <div class="footer-left">
-      <img src="resources/logo/ujat.png" width="55%" alt="UJAT">
-    </div>
-    <div class="footer-center" style="width: 400px; text-align: center;">
-      <img style="margin-right: 100px;" class="text-center" src="resources/logo/dacyti.png" width="50%" alt="DACYTI">
-    </div>
-    <div class="footer-right" style="margin-left: 80px;">
-      <img src="resources/logo/eges.png" width="85%" alt="EGES">
-    </div>
+  <footer class="app-footer">
+    <img src="resources/logo/ujat.png" alt="Universidad Juárez Autónoma de Tabasco">
+    <img src="resources/logo/dacyti.png" alt="División Académica de Ciencias y Tecnologías de la Información">
+    <img src="resources/logo/eges.png" alt="EGES para el desarrollo">
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>

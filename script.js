@@ -15,6 +15,11 @@ const STATUS = document.getElementById("status");
 const PREDICT = document.getElementById("predict");
 const videoStage = document.getElementById("videoStage");
 const cameraHint = document.getElementById("cameraHint");
+const confidenceMeter = document.getElementById("confidenceMeter");
+const confidenceFill = document.getElementById("confidenceFill");
+const confidenceValue = document.getElementById("confidenceValue");
+const zoomButton = document.getElementById("zoomButton");
+const letterButtons = document.querySelectorAll(".list-group-item");
 
 const MOBILE_NET_INPUT_WIDTH = 224;
 const MOBILE_NET_INPUT_HEIGHT = 224;
@@ -32,9 +37,30 @@ let lastVideoTime = -1;
 let results = undefined;
 let classNames = ["Palma", "?"];
 let modelsReady = false;
+let predictLoopActive = false;
 
-function setStatus(message) {
+let lastResultState = "";
+
+function setStatus(message, isError = false) {
   STATUS.textContent = message || "";
+  STATUS.classList.toggle("is-error", isError);
+}
+
+// El mensaje se anuncia por lector de pantalla, así que solo se reescribe
+// cuando cambia de estado; el porcentaje vive en la barra, que no se anuncia.
+function setResult(state, message, confidence) {
+  if (state !== lastResultState) {
+    lastResultState = state;
+    PREDICT.textContent = message;
+    PREDICT.dataset.state = state;
+    PREDICT.style.display = "flex";
+  }
+
+  const percent = Math.max(0, Math.min(100, Math.round(confidence)));
+  confidenceFill.style.width = `${percent}%`;
+  confidenceFill.classList.toggle("is-success", state === "success");
+  confidenceValue.textContent = `${percent}%`;
+  confidenceMeter.setAttribute("aria-valuenow", String(percent));
 }
 
 function waitForGlobal(name, timeoutMs = 20000) {
@@ -104,14 +130,13 @@ async function bootstrap() {
       waitForGlobal("HAND_CONNECTIONS"),
     ]);
     modelsReady = true;
-    PREDICT.textContent = "Sin letra seleccionada";
-    PREDICT.style.display = "block";
     await enableCam();
   } catch (error) {
     console.error(error);
     demosSection.classList.remove("invisible");
     setStatus(
-      "Error al cargar recursos. Revisa tu conexión a internet y recarga la página."
+      "Error al cargar recursos. Revisa tu conexión a internet y recarga la página.",
+      true
     );
   }
 }
@@ -125,7 +150,7 @@ async function enableCam() {
     return;
   }
   if (!hasGetUserMedia()) {
-    setStatus("Tu navegador no soporta acceso a la webcam.");
+    setStatus("Tu navegador no soporta acceso a la webcam.", true);
     return;
   }
 
@@ -141,16 +166,15 @@ async function enableCam() {
 
     webcamRunning = true;
     predict = true;
-    PREDICT.style.display = "block";
     videoStage.classList.add("active");
     setStatus(
       selectedLetter
-        ? `Reconociendo letra ${selectedLetter}. Muestra tu mano frente a la cámara.`
-        : "Cámara lista. Elige una letra del menú (⋮) para empezar."
+        ? `Reconociendo la letra ${selectedLetter}.`
+        : "Cámara lista. Elige una letra para empezar a practicar."
     );
 
     startRenderLoop();
-    predictLoop();
+    startPredictLoop();
   } catch (error) {
     console.error(error);
     if (cameraHint) {
@@ -158,7 +182,8 @@ async function enableCam() {
         "No se pudo abrir la cámara. Permite el acceso y recarga la página.";
     }
     setStatus(
-      "No se pudo acceder a la cámara. Revisa permisos del navegador (localhost/HTTPS)."
+      "No se pudo acceder a la cámara. Revisa los permisos del navegador.",
+      true
     );
   }
 }
@@ -243,8 +268,18 @@ function calculateFeaturesOnCurrentFrame(tf) {
   });
 }
 
+// Evita que coincidan dos bucles de inferencia y se duplique el trabajo.
+function startPredictLoop() {
+  if (predictLoopActive) {
+    return;
+  }
+  predictLoopActive = true;
+  predictLoop();
+}
+
 function predictLoop() {
   if (!predict) {
+    predictLoopActive = false;
     return;
   }
 
@@ -256,8 +291,8 @@ function predictLoop() {
 
   try {
     if (!hasHand()) {
-      PREDICT.textContent = "Muestra tu mano frente a la cámara";
-      letterText.style.color = "white";
+      setResult("waiting", "Muestra tu mano frente a la cámara", 0);
+      letterText.style.color = "";
     } else {
       tf.tidy(() => {
         const imageFeatures = calculateFeaturesOnCurrentFrame(tf);
@@ -267,17 +302,17 @@ function predictLoop() {
         const prediction = modelCustom.predict(imageFeatures.expandDims()).squeeze();
         const highestIndex = prediction.argMax().arraySync();
         const predictionArray = prediction.arraySync();
-        const predictRate = Math.floor(predictionArray[highestIndex] * 100);
+        const letterRate = Math.floor((predictionArray[1] ?? 0) * 100);
 
         if (classNames[highestIndex] === "Palma") {
-          PREDICT.textContent = "SIGUE INTENTANDO";
-          letterText.style.color = "white";
-        } else if (predictRate >= SUCCESS_THRESHOLD) {
-          PREDICT.textContent = `LO TIENES (${predictRate}%)`;
-          letterText.style.color = "rgb(245, 116, 116)";
+          setResult("retry", "Sigue intentando", letterRate);
+          letterText.style.color = "";
+        } else if (letterRate >= SUCCESS_THRESHOLD) {
+          setResult("success", "¡Lo tienes!", letterRate);
+          letterText.style.color = "var(--success)";
         } else {
-          PREDICT.textContent = `CASI LO TIENES (${predictRate}%)`;
-          letterText.style.color = "white";
+          setResult("near", "Casi lo tienes", letterRate);
+          letterText.style.color = "";
         }
       });
     }
@@ -310,36 +345,43 @@ async function loadLetter(option) {
   const screenshotPath = `resources/screenshots/${screenshot}`;
   imagen.src = screenshotPath;
   imagenLetter.src = screenshotPath;
-  imagenLetter.alt = `Referencia letra ${letter}`;
+  imagenLetter.alt = `Referencia de la letra ${letter} en dactilología`;
+  zoomButton.disabled = false;
 
-  setStatus(`Cargando modelo de la letra ${letter}...`);
-  PREDICT.textContent = `Letra ${letter} seleccionada`;
-  PREDICT.style.display = "block";
+  setStatus(`Cargando el modelo de la letra ${letter}…`);
+  lastResultState = "";
+  setResult("idle", `Letra ${letter} seleccionada`, 0);
 
   try {
     modelCustom = await tf.loadLayersModel(
       `./resources/models/${folder}/modelCustom.json`
     );
     classNames = ["Palma", letter];
-    setStatus(`Reconociendo letra ${letter}. Muestra tu mano frente a la cámara.`);
+    setStatus(`Reconociendo la letra ${letter}.`);
 
     if (webcamRunning) {
       predict = true;
-      predictLoop();
+      startPredictLoop();
     } else if (modelsReady) {
       await enableCam();
     }
   } catch (error) {
     console.error(error);
     modelCustom = null;
-    setStatus(`No se pudo cargar el modelo de la letra ${letter}.`);
+    setStatus(`No se pudo cargar el modelo de la letra ${letter}.`, true);
   }
 }
 
-document.querySelectorAll(".list-group-item").forEach((enlace) => {
-  enlace.addEventListener("click", (event) => {
+letterButtons.forEach((boton) => {
+  boton.addEventListener("click", (event) => {
     event.preventDefault();
-    loadLetter(enlace.textContent.trim());
+    letterButtons.forEach((otro) => {
+      otro.classList.remove("is-active");
+      otro.setAttribute("aria-pressed", "false");
+    });
+    boton.classList.add("is-active");
+    boton.setAttribute("aria-pressed", "true");
+    loadLetter(boton.textContent.trim());
   });
 });
 
