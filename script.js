@@ -288,17 +288,14 @@ function predictLoop() {
   window.requestAnimationFrame(predictLoop);
 }
 
+// Los nombres se normalizan a NFC porque así están versionados los archivos.
+// Linux distingue NFC de NFD, aunque macOS los trate como equivalentes.
 function resolveLetterAssets(option) {
-  const normalized = option.trim().normalize("NFC").toUpperCase();
-  // En disco la Ñ está guardada como N + tilde combinante (NFD).
-  if (normalized === "Ñ") {
-    const nTilde = "N\u0303";
-    return { letter: "Ñ", folder: nTilde, screenshot: `${nTilde}.png` };
-  }
+  const letter = option.trim().normalize("NFC").toUpperCase();
   return {
-    letter: normalized,
-    folder: normalized,
-    screenshot: `${normalized}.png`,
+    letter,
+    folder: encodeURIComponent(letter),
+    screenshot: `${encodeURIComponent(letter)}.png`,
   };
 }
 
